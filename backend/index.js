@@ -9,9 +9,23 @@ require('dotenv').config()
 // middleware
 app.use(express.json());
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true
-}))
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      "http://localhost:5173",
+      process.env.FRONTEND_URL
+    ];
+
+    // Postman / server-side requests ke liye
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
 
 // routes
 const bookRoutes = require('./src/books/book.route');
